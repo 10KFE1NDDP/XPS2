@@ -2090,7 +2090,7 @@ GSTextureCache::Target* GSTextureCache::LookupTarget(GIFRegTEX0 TEX0, const GSVe
 
 				std::swap(dst->m_texture, tex);
 				PreloadTarget(TEX0, size, GSVector2i(dst->m_valid.z, dst->m_valid.w), is_frame, preload,
-					preserve_target, draw_rect, dst);
+					preserve_target, draw_rect, dst, fbmask &= GSLocalMemory::m_psm[dst->m_TEX0.PSM].fmsk);
 				g_gs_device->StretchRect(tex, GSVector4::cxpr(0.0f, 0.0f, 1.0f, 1.0f), dst->m_texture,
 					GSVector4(dst->m_texture->GetRect()), false, false, false, true);
 				g_gs_device->Recycle(tex);
@@ -2356,7 +2356,7 @@ GSTextureCache::Target* GSTextureCache::CreateTarget(GIFRegTEX0 TEX0, const GSVe
 	if (!dst) [[unlikely]]
 		return nullptr;
 
-	const bool was_clear = PreloadTarget(TEX0, size, valid_size, is_frame, preload, preserve_target, draw_rect, dst, src);
+	const bool was_clear = PreloadTarget(TEX0, size, valid_size, is_frame, preload, preserve_target, draw_rect, dst, fbmask &= GSLocalMemory::m_psm[dst->m_TEX0.PSM].fmsk, src);
 
 	dst->m_is_frame = is_frame;
 
@@ -2443,7 +2443,7 @@ GSTextureCache::Target* GSTextureCache::CreateTarget(GIFRegTEX0 TEX0, const GSVe
 }
 
 bool GSTextureCache::PreloadTarget(GIFRegTEX0 TEX0, const GSVector2i& size, const GSVector2i& valid_size, bool is_frame,
-	bool preload, bool preserve_target, const GSVector4i draw_rect, Target* dst, GSTextureCache::Source* src)
+	bool preload, bool preserve_target, const GSVector4i draw_rect, Target* dst, u32 fbmask, GSTextureCache::Source* src)
 {
 	// In theory new textures contain invalidated data. Still in theory a new target
 	// must contains the content of the GS memory.
@@ -2605,6 +2605,25 @@ bool GSTextureCache::PreloadTarget(GIFRegTEX0 TEX0, const GSVector2i& size, cons
 				if (dst != t && t->m_TEX0.TBW == dst->m_TEX0.TBW && t->m_TEX0.PSM == dst->m_TEX0.PSM && t->m_TEX0.TBW > 4)
 					if (t->Overlaps(dst->m_TEX0.TBP0, dst->m_TEX0.TBW, dst->m_TEX0.PSM, dst->m_valid))
 					{
+						// If the two targets are misaligned, it's likely a relocation, so we can just kill the old target.
+						if ((((t->m_TEX0.TBP0 - dst->m_TEX0.TBP0) >> 5) % dst->m_TEX0.TBW) != 0)
+						{
+							if (fbmask)
+							{
+								t->m_valid_rgb &= !!(fbmask & 0x00FFFFFF);
+								t->m_valid_alpha_low &= !!(fbmask & 0x0F000000);
+								t->m_valid_alpha_high &= !!(fbmask & 0xF0000000);
+								i++;
+							}
+							else
+							{
+								InvalidateSourcesFromTarget(t);
+								i = list.erase(j);
+								delete t;
+							}
+							continue;
+						}
+
 						// could be overwriting a double buffer, so if it's the second half of it, just reduce the size down to half.
 						if (((((t->UnwrappedEndBlock() + 1) - t->m_TEX0.TBP0) >> 1) + t->m_TEX0.TBP0) == dst->m_TEX0.TBP0)
 						{
