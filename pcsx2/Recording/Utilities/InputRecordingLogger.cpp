@@ -14,7 +14,7 @@
 namespace InputRec
 {
 	void log(const std::string& log)
-	{
+	{			
 		if (!log.empty())
 		{
 			recordingConLog(fmt::format("[REC]: {}\n", log));
