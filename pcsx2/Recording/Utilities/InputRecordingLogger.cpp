@@ -5,6 +5,7 @@
 
 #include "DebugTools/Debug.h"
 #include "common/Console.h"
+#include "IconsFontAwesome5.h"
 #include "GS.h"
 #include "Host.h"
 
@@ -13,11 +14,11 @@
 namespace InputRec
 {
 	void log(const std::string& log)
-	{
+	{			
 		if (!log.empty())
 		{
 			recordingConLog(fmt::format("[REC]: {}\n", log));
-			Host::AddOSDMessage(log, 15.0f);
+			Host::AddIconOSDMessage("input_rec_status", ICON_FA_KEYBOARD, log, Host::OSD_INFO_DURATION);
 		}
 	}
 
