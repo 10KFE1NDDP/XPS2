@@ -2615,12 +2615,20 @@ bool GSTextureCache::PreloadTarget(GIFRegTEX0 TEX0, const GSVector2i& size, cons
 								t->m_valid_alpha_low &= !!(fbmask & 0x0F000000);
 								t->m_valid_alpha_high &= !!(fbmask & 0xF0000000);
 								i++;
+								Console.Warning("FBMASK T: TBP0: %x, end block: %x, TBW: %d", t->m_TEX0.TBP0, t->m_end_block, t->m_TEX0.TBW);
+								Console.Warning("FBMASK T m_valid: x: %d, y: %d, z: %d, w: %d", t->m_valid.x, t->m_valid.y, t->m_valid.z, t->m_valid.w);
+								Console.Warning("FBMASK DST: TBP0: %x, end block: %x, TBW: %d", dst->m_TEX0.TBP0, dst->m_end_block, dst->m_TEX0.TBW);
+								Console.Warning("FBMASK DST m_valid: x: %d, y: %d, z: %d, w: %d", dst->m_valid.x, dst->m_valid.y, dst->m_valid.z, dst->m_valid.w);
 							}
 							else
 							{
 								InvalidateSourcesFromTarget(t);
 								i = list.erase(j);
 								delete t;
+								Console.Warning("Invalidate T: TBP0: %x, end block: %x, TBW: %d", t->m_TEX0.TBP0, t->m_end_block, t->m_TEX0.TBW);
+								Console.Warning("Invalidate T m_valid: x: %d, y: %d, z: %d, w: %d", t->m_valid.x, t->m_valid.y, t->m_valid.z, t->m_valid.w);
+								Console.Warning("Invalidate DST: TBP0: %x, end block: %x, TBW: %d", dst->m_TEX0.TBP0, dst->m_end_block, dst->m_TEX0.TBW);
+								Console.Warning("Invalidate DST m_valid: x: %d, y: %d, z: %d, w: %d", dst->m_valid.x, dst->m_valid.y, dst->m_valid.z, dst->m_valid.w);
 							}
 
 							continue;
