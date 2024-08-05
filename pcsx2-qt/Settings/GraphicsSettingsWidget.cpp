@@ -507,7 +507,11 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* dialog, QWidget* 
 			m_ui.mipmapping, tr("Mipmapping"), tr("Checked"), tr("Enables mipmapping, which some games require to render correctly."));
 
 		dialog->registerWidgetHelp(
-			m_ui.textureFiltering, tr("Texture Filtering"), tr("Bilinear (PS2)"), tr("Control the texture filtering of the emulation."));
+			m_ui.textureFiltering, tr("Texture Filtering"), tr("Bilinear (PS2)"),
+			tr("Changes what filtering algorithm is used to map textures to surfaces. Nearest will make no attempt to blend colors,"
+			   "and simply re-scale pixels to the target size. Bilinear will blend colors together to remove harsh edges between "
+			   "different colored pixels. PS2 mode will apply filtering to all surfaces that a game instructs the PS2 to filter. "
+			   "Forced mode will apply filtering to all surfaces, even if the game told the PS2 not to."));
 
 		dialog->registerWidgetHelp(m_ui.trilinearFiltering, tr("Trilinear Filtering"), tr("Automatic (Default)"),
 			tr("Control the texture's trilinear filtering of the emulation."));
