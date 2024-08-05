@@ -46,6 +46,7 @@ GSDevice11::GSDevice11()
 
 	m_features.primitive_id = true;
 	m_features.texture_barrier = false;
+	m_features.prefer_blend_second_pass = !m_features.texture_barrier;
 	m_features.provoking_vertex_last = false;
 	m_features.point_expand = false;
 	m_features.line_expand = false;

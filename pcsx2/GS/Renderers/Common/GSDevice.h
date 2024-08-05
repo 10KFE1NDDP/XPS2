@@ -752,20 +752,21 @@ public:
 	// clang-format off
 	struct FeatureSupport
 	{
-		bool broken_point_sampler : 1; ///< Issue with AMD cards, see tfx shader for details
-		bool vs_expand            : 1; ///< Supports expanding points/lines/sprites in the vertex shader
-		bool primitive_id         : 1; ///< Supports primitive ID for use with prim tracking destination alpha algorithm
-		bool texture_barrier      : 1; ///< Supports sampling rt and hopefully texture barrier
-		bool provoking_vertex_last: 1; ///< Supports using the last vertex in a primitive as the value for flat shading.
-		bool point_expand         : 1; ///< Supports point expansion in hardware.
-		bool line_expand          : 1; ///< Supports line expansion in hardware.
-		bool prefer_new_textures  : 1; ///< Allocate textures up to the pool size before reusing them, to avoid render pass restarts.
-		bool dxt_textures         : 1; ///< Supports DXTn texture compression, i.e. S3TC and BC1-3.
-		bool bptc_textures        : 1; ///< Supports BC6/7 texture compression.
-		bool framebuffer_fetch    : 1; ///< Can sample from the framebuffer without texture barriers.
-		bool stencil_buffer       : 1; ///< Supports stencil buffer, and can use for DATE.
-		bool cas_sharpening       : 1; ///< Supports sufficient functionality for contrast adaptive sharpening.
-		bool test_and_sample_depth: 1; ///< Supports concurrently binding the depth-stencil buffer for sampling and depth testing.
+		bool broken_point_sampler     : 1; ///< Issue with AMD cards, see tfx shader for details
+		bool vs_expand                : 1; ///< Supports expanding points/lines/sprites in the vertex shader
+		bool primitive_id             : 1; ///< Supports primitive ID for use with prim tracking destination alpha algorithm
+		bool texture_barrier          : 1; ///< Supports sampling rt and hopefully texture barrier
+		bool prefer_blend_second_pass : 1; ///< DX or AMD to prefer blend second pass over barriers.
+		bool provoking_vertex_last    : 1; ///< Supports using the last vertex in a primitive as the value for flat shading.
+		bool point_expand             : 1; ///< Supports point expansion in hardware.
+		bool line_expand              : 1; ///< Supports line expansion in hardware.
+		bool prefer_new_textures      : 1; ///< Allocate textures up to the pool size before reusing them, to avoid render pass restarts.
+		bool dxt_textures             : 1; ///< Supports DXTn texture compression, i.e. S3TC and BC1-3.
+		bool bptc_textures            : 1; ///< Supports BC6/7 texture compression.
+		bool framebuffer_fetch        : 1; ///< Can sample from the framebuffer without texture barriers.
+		bool stencil_buffer           : 1; ///< Supports stencil buffer, and can use for DATE.
+		bool cas_sharpening           : 1; ///< Supports sufficient functionality for contrast adaptive sharpening.
+		bool test_and_sample_depth    : 1; ///< Supports concurrently binding the depth-stencil buffer for sampling and depth testing.
 		FeatureSupport()
 		{
 			memset(this, 0, sizeof(*this));

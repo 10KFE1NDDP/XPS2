@@ -606,7 +606,7 @@ bool GSDeviceOGL::CreateTextureFX()
 
 bool GSDeviceOGL::CheckFeatures(bool& buggy_pbo)
 {
-	//bool vendor_id_amd = false;
+	bool vendor_id_amd = false;
 	bool vendor_id_nvidia = false;
 	//bool vendor_id_intel = false;
 
@@ -615,7 +615,7 @@ bool GSDeviceOGL::CheckFeatures(bool& buggy_pbo)
 		std::strstr(vendor, "ATI"))
 	{
 		Console.WriteLn(Color_StrongRed, "OGL: AMD GPU detected.");
-		//vendor_id_amd = true;
+		vendor_id_amd = true;
 	}
 	else if (std::strstr(vendor, "NVIDIA Corporation"))
 	{
@@ -735,6 +735,7 @@ bool GSDeviceOGL::CheckFeatures(bool& buggy_pbo)
 			"GL_ARB_texture_barrier is not supported, blending will not be accurate.", Host::OSD_ERROR_DURATION);
 	}
 
+	m_features.prefer_blend_second_pass = !m_features.texture_barrier || vendor_id_amd;
 	m_features.provoking_vertex_last = true;
 	m_features.dxt_textures = GLAD_GL_EXT_texture_compression_s3tc;
 	m_features.bptc_textures =

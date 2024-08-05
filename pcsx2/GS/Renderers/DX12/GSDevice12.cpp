@@ -1210,6 +1210,7 @@ bool GSDevice12::CheckFeatures()
 	const bool isAMD = (vendorID == 0x1002 || vendorID == 0x1022);
 
 	m_features.texture_barrier = false;
+	m_features.prefer_blend_second_pass = !m_features.texture_barrier;
 	m_features.broken_point_sampler = isAMD;
 	m_features.primitive_id = true;
 	m_features.prefer_new_textures = true;

@@ -4298,8 +4298,10 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, const boo
 	// HW blend can be done in multiple passes when there's no overlap.
 	// Blend second pass is only useful when texture barriers aren't supported.
 	// Speed wise Texture barriers > blend second pass > texture copies.
-	const bool blend_second_pass_support = !features.texture_barrier && no_prim_overlap && is_basic_blend;
+	const bool blend_second_pass_support = features.prefer_blend_second_pass && COLCLAMP.CLAMP && no_prim_overlap && is_basic_blend;
 	const bool bmix1_second_pass = blend_second_pass_support && blend_mix1 && (alpha_c0_high_max_one || alpha_c2_high_one) && m_conf.ps.blend_d == 2;
+	const bool ad_second_pass = blend_second_pass_support && alpha_c1_high_no_rta_correct &&
+								(blend_flag & (BLEND_HW3 | BLEND_HW5 | BLEND_HW6 | BLEND_HW7 | BLEND_HW9));
 	// We don't want to enable blend mix if we are doing a second pass, it's useless.
 	blend_mix &= !bmix1_second_pass;
 
@@ -4322,10 +4324,10 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, const boo
 			// Blend can be done in a single draw, and we already need a barrier.
 			// On fbfetch, one barrier is like full barrier.
 			|| (one_barrier && (no_prim_overlap || features.framebuffer_fetch))
-			// Blending with alpha > 1 will be wrong, except BLEND_HW2.
-			|| (!(blend_flag & BLEND_HW2) && (alpha_c2_high_one || alpha_c0_high_max_one) && no_prim_overlap)
-			// Ad blends are completely wrong without sw blend (Ad is 0.5 not 1 for 128). We can spare a barrier for it.
-			|| (blend_ad && no_prim_overlap && !new_rt_alpha_scale);
+			// Blending with alpha > 1 will be wrong, except BLEND_HW2, and blend second pass.
+			|| (!((blend_flag & BLEND_HW2) || bmix1_second_pass) && (alpha_c2_high_one || alpha_c0_high_max_one) && no_prim_overlap)
+			// Ad blends are completely wrong without sw blend (Ad is 0.5 not 1 for 128). We can spare a barrier for it, except for blend second pass.
+			|| (blend_ad && no_prim_overlap && !(new_rt_alpha_scale || ad_second_pass));
 
 		switch (GSConfig.AccurateBlendingUnit)
 		{
@@ -4363,9 +4365,6 @@ void GSRendererHW::EmulateBlending(int rt_alpha_min, int rt_alpha_max, const boo
 	}
 	else
 	{
-		const bool ad_second_pass = blend_second_pass_support && alpha_c1_high_no_rta_correct && COLCLAMP.CLAMP &&
-									(blend_flag & (BLEND_HW3 | BLEND_HW5 | BLEND_HW6 | BLEND_HW7 | BLEND_HW9));
-
 		switch (GSConfig.AccurateBlendingUnit)
 		{
 			case AccBlendLevel::Maximum:
